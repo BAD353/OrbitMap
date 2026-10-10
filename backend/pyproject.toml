@@ -1,0 +1,9 @@
+[project]
+name = "orbit-map-backend"
+version = "0.1.0"
+description = "Satellite map backend"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]",
+]
