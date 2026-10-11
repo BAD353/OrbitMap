@@ -41,6 +41,7 @@ create table if not exists database_state(
     id boolean primary key default true,
     seeded boolean not null default false,
     last_epoch timestamptz,
+    last_creation_date timestamptz,
     updated_at timestamptz not null default now()
 );
 

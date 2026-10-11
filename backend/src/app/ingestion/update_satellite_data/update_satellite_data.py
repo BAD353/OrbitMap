@@ -28,29 +28,31 @@ def elset_fields(record):
     )
 
 def update_satellite_data(conn: Connection, seeding: bool):
-    last_update = conn.execute("SELECT updated_at FROM database_state WHERE id = true").fetchone()[0]
-    if (not seeding and datetime.now(timezone.utc) - last_update < timedelta(hours=1)):
-        return (True, False, False)
+    new_data = []
+    now = datetime.now(timezone.utc)
 
-    success, last_epoch, today = fetch_satellite_data()
-    if not success:
-        return (False, last_epoch, today)
-
-    satellite_data = []
-    data_path = Path("data/raw-historical/new_satellite_data.json")
-    if seeding:
-        data_path = Path("data/raw-historical/satellite_data.json")
-
-    if data_path.exists():
-        with data_path.open() as file:
-            satellite_data = json.load(file)
+    if seeding: # fetch last month if seeding
+        print("Fetching data for seeding:")
+        new_data = fetch_satellite_data(now - timedelta(days=30), now)
     else:
-        return (False, last_epoch, today)
+        last_update, last_creation_date = conn.execute("""
+            SELECT updated_at, last_creation_date 
+            FROM database_state 
+            WHERE id = true
+        """).fetchone()
+        if (now - last_update < timedelta(hours=1)):
+            return (False, None)
 
+        # fetch for the max time - 1h in case of space-track adding some old elsets retroactively
+        new_data = fetch_satellite_data(last_creation_date - timedelta(hours=1), now) 
+        if len(new_data) == 0:
+            return (False, None)
+
+    print("Fetched", len(new_data),"rows")
 
     unique_sat_data = {}
 
-    for record in satellite_data:
+    for record in new_data:
         if not unique_sat_data.get(record["NORAD_CAT_ID"]) or \
             unique_sat_data.get(record["NORAD_CAT_ID"])["EPOCH"] < record["EPOCH"]:
             unique_sat_data[record["NORAD_CAT_ID"]] = record
@@ -88,7 +90,7 @@ def update_satellite_data(conn: Connection, seeding: bool):
         )
         )
 
-    for record in satellite_data:
+    for record in new_data:
         conn.execute("""
             INSERT INTO elsets (
                 norad_id, epoch, inclination, right_ascension, 
@@ -147,8 +149,13 @@ def update_satellite_data(conn: Connection, seeding: bool):
         """,
         elset_fields(record)
         )
-   
-    return (True, last_epoch, today)
+
+
+    new_last_creation_date = max(
+        datetime.fromisoformat(record["CREATION_DATE"])
+        for record in new_data
+    )
+    return (True, new_last_creation_date)
 
 
 # {
