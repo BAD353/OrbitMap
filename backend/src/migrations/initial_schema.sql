@@ -5,7 +5,8 @@ create table if not exists satellites (
     country text,
     object_type text,
     launch_date date,
-    decay_date date
+    decay_date date,
+    updated_at timestamptz not null default now()
 );
 
 create table if not exists elsets (
@@ -28,6 +29,7 @@ create table if not exists elsets (
     period double precision,
     apoapsis double precision,
     periapsis double precision,
+    updated_at timestamptz not null default now(),
     primary key (norad_id, epoch)
 );
 

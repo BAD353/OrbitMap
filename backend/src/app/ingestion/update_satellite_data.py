@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
-from app.ingestion.update_satellite_data.fetch_satellite_data import fetch_satellite_data
+from app.ingestion.fetch_satellite_data import fetch_satellite_data
 from db import pool
 from psycopg import Connection
 

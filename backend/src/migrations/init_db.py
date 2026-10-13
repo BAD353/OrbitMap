@@ -1,4 +1,4 @@
-from app.ingestion.update_satellite_data.update_satellite_data import update_satellite_data
+from app.ingestion.update_satellite_data import update_satellite_data
 import psycopg
 from datetime import datetime, timezone
 from pathlib import Path

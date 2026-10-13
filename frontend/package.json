@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "cesium": "^1.146.0",
+    "idb-keyval": "^6.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "resium": "^1.27.0"
+    "resium": "^1.27.0",
+    "satellite.js": "^7.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
