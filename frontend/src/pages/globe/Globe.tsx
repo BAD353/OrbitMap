@@ -7,9 +7,10 @@ import {
   useCesium,
   Entity,
 } from "resium";
-import { getSatellites, propagateSatellites } from "../../services";
+import { getSatellites, launchPropagation, propagateSatellites } from "../../services";
 import { geodeticToCesiumPosition } from "../../util/geodeticToCesiumPosition";
 import type { Satellite } from "../../types/satellite/satellite";
+import { SatelliteLayer } from "./SatelliteLayer";
 
 function IonTileset() {
   const { viewer } = useCesium();
@@ -56,34 +57,20 @@ function Globe() {
   const [satellites, setSatellites] = useState<Satellite[]>([]);
 
   useEffect(()=>{
-    propagateSatellites();
-    setSatellites(getSatellites());
+    launchPropagation(()=>{
+      // console.log("Setting");
+      // const temp = getSatellites();
+      const sats = getSatellites();
+      setSatellites(sats);
+      // console.log(temp[0].latestGeodeticPositions[temp[0].latestGeodeticPositions.length-1].epoch)
+    });
   }, []);
 
   return (
     <div style={styles.mapWrapper}>
       <Viewer full timeline={false} ref={ref}>
         <IonTileset />
-        {satellites.map(
-          satellite => satellite.latestGeodeticposition === undefined?
-          <></>:
-          <Entity
-            name={satellite.info.name}
-            position={geodeticToCesiumPosition(satellite.latestGeodeticposition.pos)}
-            point={{
-              pixelSize: 10,
-              color: Color.RED,
-              outlineColor: Color.WHITE,
-              outlineWidth: 2,
-              scaleByDistance: new NearFarScalar(
-                100_000,   
-                1.0,
-                10_000_000,
-                0.1
-              ),
-            }}
-          />
-        )}
+        <SatelliteLayer/>
       </Viewer>
     </div>
   );

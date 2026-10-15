@@ -28,3 +28,20 @@ export function propagateSatellites() {
 export function getSatellites() {
   return satelliteList;
 }
+
+let hasLaunchedPropagation = false;
+
+function continiousPropagation(onUpdate: Function) {
+  setInterval(()=>{
+    satelliteList.forEach(propagateSatellite);
+    console.log("Propagated");
+    onUpdate();
+  },1000);
+}
+
+export function launchPropagation(onUpdate: Function) {
+  if (!hasLaunchedPropagation) {
+    hasLaunchedPropagation = true;
+    continiousPropagation(onUpdate);
+  }
+}

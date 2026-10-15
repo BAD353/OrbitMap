@@ -8,5 +8,5 @@ export interface Satellite {
   launchDate: Date;
   decayDate: Date | undefined;
   latestElset: Elset | undefined;
-  latestGeodeticposition: GeodeticState | undefined;
+  latestGeodeticPositions: GeodeticState[];
 };
