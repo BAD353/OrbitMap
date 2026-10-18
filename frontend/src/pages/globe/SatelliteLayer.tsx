@@ -5,6 +5,8 @@ import {
 } from "resium";
 import { getSatellites } from "../../services";
 import { geodeticToCesiumPosition } from "../../util/geodeticToCesiumPosition";
+import type { GeodeticState } from "../../types/coordinates/geodetic";
+import { interpolateGeodetic } from "../../util/interpolateGeodetic";
 
 
 export function SatelliteLayer() {
@@ -45,7 +47,35 @@ export function SatelliteLayer() {
         for (let i = 0; i < points.length; i++) {
           if (satellites.length > i && satellites[i].latestGeodeticPositions.length > 0) {
             points[i].show = true;
-            points[i].position = geodeticToCesiumPosition(satellites[i].latestGeodeticPositions[satellites[i].latestGeodeticPositions.length-1].pos);
+            if (i == 0) {
+              // console.log(satellites[i].latestGeodeticPositions);
+            }
+            let pos: number | undefined = undefined;
+            const time = new Date();
+            for (let j = 0; j < satellites[i].latestGeodeticPositions.length-1; j++) {
+              if (
+                satellites[i].latestGeodeticPositions[j].epoch <= time 
+                && time <= satellites[i].latestGeodeticPositions[j+1].epoch
+              ) {
+                pos = j;
+                break;
+              }
+            }
+            if (!pos) {
+              points[i].show = false;
+              continue;
+            }
+            const state = interpolateGeodetic(
+              satellites[i].latestGeodeticPositions[pos], satellites[i].latestGeodeticPositions[pos+1], time
+            );
+            if (!state) {
+              points[i].show = false;
+              continue;
+            }
+            if (i == 0) {
+              console.log(satellites[i].latestGeodeticPositions[pos].pos.latitude, state.pos.latitude, satellites[i].latestGeodeticPositions[pos+1].pos.latitude)
+            }
+            points[i].position = geodeticToCesiumPosition(state.pos);
           }
           else points[i].show = false;
 

@@ -1,5 +1,4 @@
 import {
-  degreesToRadians,
   eciToGeodetic,
   gstime,
   json2satrec,
