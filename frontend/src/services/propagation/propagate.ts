@@ -1,4 +1,5 @@
 import {
+  eciToEcf,
   eciToGeodetic,
   gstime,
   json2satrec,
@@ -40,20 +41,29 @@ export function propagateSatellite(satellite: Satellite) {
 
   const gmst = gstime(new Date());
 
-  const geodeticPos = eciToGeodetic(positionAndVelocity.position, gmst);
-  const geodeticVel = eciToGeodetic(positionAndVelocity.velocity, gmst);
+  // const geodeticPos = eciToGeodetic(positionAndVelocity.position, gmst);
+  // const geodeticVel = eciToGeodetic(positionAndVelocity.velocity, gmst);
 
-  satellite.latestGeodeticPositions.push({
-    pos: {
-      longitude: radiansToDegrees(geodeticPos.longitude),
-      latitude: radiansToDegrees(geodeticPos.latitude),
-      height: geodeticPos.height,
-    },
-    vel: {
-      longitude: radiansToDegrees(geodeticVel.longitude),
-      latitude: radiansToDegrees(geodeticVel.latitude),
-      height: geodeticVel.height,
-    },
-    epoch: propagationEpoch,
+  // satellite.latestGeodeticPositions.push({
+  //   pos: {
+  //     longitude: radiansToDegrees(geodeticPos.longitude),
+  //     latitude: radiansToDegrees(geodeticPos.latitude),
+  //     height: geodeticPos.height,
+  //   },
+  //   vel: {
+  //     longitude: radiansToDegrees(geodeticVel.longitude),
+  //     latitude: radiansToDegrees(geodeticVel.latitude),
+  //     height: geodeticVel.height,
+  //   },
+  //   epoch: propagationEpoch.getTime(),
+  // });
+
+  const ecefPos = eciToEcf(positionAndVelocity.position, gmst);
+  const ecefVel = eciToEcf(positionAndVelocity.velocity, gmst);
+
+  satellite.latestECEFPositions.push({
+    pos: ecefPos,
+    vel: ecefVel,
+    epoch: propagationEpoch.getTime(),
   });
 }

@@ -13,5 +13,5 @@ export interface GeodeticVelocity {
 export interface GeodeticState {
   pos: GeodeticPosition;
   vel: GeodeticVelocity;
-  epoch: Date;
+  epoch: number;
 }

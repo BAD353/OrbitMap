@@ -1,9 +1,12 @@
+import { Cartesian3, JulianDate } from "cesium";
 import type { Satellite } from "../types/satellite/satellite";
 import type { PropagateWorkerRequest } from "../types/worker/propagateWorkerRequest";
-import { propagateSatellite } from "./propagation/propagate";
+import { geodeticToCesiumPosition } from "../util/geodeticToCesiumPosition";
+import { interpolateGeodetic } from "../util/interpolateGeodetic";
 import { createPropagateWrapper } from "./propagation/propagateWrapper";
 import { loadElsetData } from "./storage/loadElsetData";
 import { loadSatelliteData } from "./storage/loadSatelliteData";
+import { interpolateECEF } from "../util/interpolateECEF";
 
 let satelliteList: Satellite[] = [];
 let satelliteIDMap: Map<string, number> = new Map();
@@ -33,10 +36,10 @@ const propagateWrapper = createPropagateWrapper((res) => {
     const id = satelliteIDMap.get(update.noradID);
     if (id == undefined) continue;
     if (update.state == undefined) {
-      satelliteList[id].latestGeodeticPositions = [];
+      satelliteList[id].latestECEFPositions = [];
       continue;
     }
-    satelliteList[id].latestGeodeticPositions.push(update.state);
+    satelliteList[id].latestECEFPositions.push(update.state);
   }
 });
 
@@ -54,17 +57,19 @@ export function propagateSatellites() {
     propagateList: [],
   };
 
+  const now = (new Date()).getTime();
+
   for (let i = 0; i < satelliteList.length; i++) {
     while (
-      satelliteList[i].latestGeodeticPositions.length > 2 &&
-      satelliteList[i].latestGeodeticPositions[3].epoch < new Date()
+      satelliteList[i].latestECEFPositions.length > 2 &&
+      satelliteList[i].latestECEFPositions[3].epoch < now
     ) {
-      satelliteList[i].latestGeodeticPositions.shift();
+      satelliteList[i].latestECEFPositions.shift();
     }
     let lastDate =
-      satelliteList[i].latestGeodeticPositions.length == 0
+      satelliteList[i].latestECEFPositions.length == 0
         ? undefined
-        : satelliteList[i].latestGeodeticPositions[satelliteList[i].latestGeodeticPositions.length - 1].epoch.getTime();
+        : satelliteList[i].latestECEFPositions[satelliteList[i].latestECEFPositions.length - 1].epoch;
     while (lastDate == undefined || lastDate <= Date.now() + 2 * 5000) {
       //update every 5 seconds with a 2x buffer
       lastDate = lastDate ? lastDate + 5000 : Date.now();
@@ -79,6 +84,10 @@ export function propagateSatellites() {
 
 export function getSatellites() {
   return satelliteList;
+}
+
+export function getSatelliteByID(satelliteID: string): Satellite | undefined {
+  return satelliteList.find(sat=>sat.noradID === satelliteID);
 }
 
 let hasLaunchedPropagation = false;
@@ -96,4 +105,39 @@ export function launchPropagation(onUpdate: Function) {
     propagateWorkerInit();
     continiousPropagation(onUpdate);
   }
+}
+
+export function getSatellitePosition(id: number | string, 
+  time: number, 
+  result?: Cartesian3,
+): Cartesian3 | undefined {
+  let pos: number | undefined = undefined;
+  let i = typeof(id) === "string"? satelliteIDMap.get(id): id;
+  if (i === undefined) return undefined;
+  for (let j = 0; j < satelliteList[i].latestECEFPositions.length-1; j++) {
+    if (
+      satelliteList[i].latestECEFPositions[j].epoch <= time 
+      && time <= satelliteList[i].latestECEFPositions[j+1].epoch
+    ) {
+      pos = j;
+      break;
+    }
+  }
+  if (pos === undefined) {
+    return undefined;
+  }
+  const state = interpolateECEF(
+    satelliteList[i].latestECEFPositions[pos], 
+    satelliteList[i].latestECEFPositions[pos+1], 
+    time
+  );
+  if (!state) {
+    return undefined;
+  }
+  if(!result) result = new Cartesian3();
+  result.x = state.pos.x*1000;
+  result.y = state.pos.y*1000;
+  result.z = state.pos.z*1000;
+  // if (id === 0) console.log("running", result);
+  return result;
 }

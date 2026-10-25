@@ -1,4 +1,51 @@
+:root {
+  --bg: #0c0a05;
+  --panel: #100d06;
+  --yellow: #ffd21f;
+  --hot: #fffbe0;
+  --text: rgb(181, 162, 90);
+  --muted: #b5a25a;
+  --line: #3a3210;
+  --border: #4a3f10;
+}
+
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.popup-container {
+  box-sizing: border-box;
+  background: rgb(16, 13, 6);
+  border: 1px solid rgb(74, 63, 16);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.text {
+  font-family: "Chakra Petch", monospace;
+  color: var(--text);
+  padding: 0;
+  margin: 0;
+}
+
+.heading {
+  line-height: 1.15;
+  color: rgb(255, 251, 224);
+  font-size: 2rem;
+  text-shadow: rgba(255, 210, 31, 0.6) 0px 0px 20px;
+}
+
+.subheading {
+  color: rgb(255, 241, 176);
+  font-size: 1rem;
+  text-shadow: rgba(255, 210, 31, 0.3) 0px 0px 20px;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: var(--border);
 }

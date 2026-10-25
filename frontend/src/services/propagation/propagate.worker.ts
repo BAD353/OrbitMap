@@ -1,8 +1,8 @@
-import { eciToGeodetic, gstime, json2satrec, propagate, radiansToDegrees, type OMMJsonObject, type SatRec } from "satellite.js";
+import {  eciToEcf, gstime, json2satrec, propagate, radiansToDegrees, type OMMJsonObject, type SatRec } from "satellite.js";
 import type { Satellite } from "../../types/satellite/satellite";
-import type { GeodeticState } from "../../types/coordinates/geodetic";
 import type { PropagateWorkerReturn } from "../../types/worker/propagateWorkerReturn";
 import type { PropagateWorkerRequest } from "../../types/worker/propagateWorkerRequest";
+import type { ECEFState } from "../../types/coordinates/ecef";
 
 let satList: SatRec[] = [];
 let satIDMap: Map<string, number> = new Map();
@@ -63,21 +63,13 @@ self.onmessage = (e: MessageEvent<PropagateWorkerRequest>) => {
       
       const gmst = gstime(new Date(time));
 
-      const geodeticPos = eciToGeodetic(positionAndVelocity.position, gmst);
-      const geodeticVel = eciToGeodetic(positionAndVelocity.velocity, gmst);
+      const ecefPos = eciToEcf(positionAndVelocity.position, gmst);
+      const ecefVel = eciToEcf(positionAndVelocity.velocity, gmst);
 
-      const latestSatellitePosition: GeodeticState = {
-        pos: {
-          longitude: radiansToDegrees(geodeticPos.longitude),
-          latitude: radiansToDegrees(geodeticPos.latitude),
-          height: geodeticPos.height,
-        },
-        vel: {
-          longitude: radiansToDegrees(geodeticVel.longitude),
-          latitude: radiansToDegrees(geodeticVel.latitude),
-          height: geodeticVel.height,
-        },
-        epoch: propagationEpoch,
+      const latestSatellitePosition: ECEFState = {
+        pos: ecefPos,
+        vel: ecefVel,
+        epoch: propagationEpoch.getTime(),
       };
       response.updates.push({noradID:satelliteID, state:latestSatellitePosition});
     }

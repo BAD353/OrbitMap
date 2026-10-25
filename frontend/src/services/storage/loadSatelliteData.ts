@@ -31,7 +31,7 @@ export async function loadSatelliteData(): Promise<Satellite[]> {
       launchDate: new Date(satellite[5] as string),
       decayDate: satellite[6] == null ? undefined : new Date(satellite[6] as string),
       latestElset: undefined,
-      latestGeodeticPositions: [],
+      latestECEFPositions: [],
     }),
   );
   const last_updated_at = Math.max(

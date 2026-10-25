@@ -1,6 +1,7 @@
 import type { Elset } from "../elset/elset";
 import type { SatelliteInfo } from "./satelliteInfo";
 import type { GeodeticState } from "../coordinates/geodetic";
+import type { ECEFState } from "../coordinates/ecef";
 
 export interface Satellite {
   noradID: string;
@@ -8,5 +9,6 @@ export interface Satellite {
   launchDate: Date;
   decayDate: Date | undefined;
   latestElset: Elset | undefined;
-  latestGeodeticPositions: GeodeticState[];
+  // latestGeodeticPositions: GeodeticState[];
+  latestECEFPositions: ECEFState[];
 };

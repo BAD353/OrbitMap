@@ -13,5 +13,5 @@ export interface ECEFVelocity {
 export interface ECEFState {
   pos: ECEFPosition;
   vel: ECEFVelocity;
-  epoch: Date;
+  epoch: number;
 }

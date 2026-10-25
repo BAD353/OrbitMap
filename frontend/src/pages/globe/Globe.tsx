@@ -1,16 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { Cartesian3, Viewer as CesiumViewer, Color, NearFarScalar } from "cesium";
-import { Cesium3DTileset as CesiumTileset } from "cesium";
 import {
-  Viewer,
-  type CesiumComponentRef,
-  useCesium,
-  Entity,
-} from "resium";
-import { getSatellites, launchPropagation, propagateSatellites } from "../../services";
+  Cartesian3,
+  Viewer as CesiumViewer,
+  Color,
+  NearFarScalar,
+} from "cesium";
+import { Cesium3DTileset as CesiumTileset } from "cesium";
+import { Viewer, type CesiumComponentRef, useCesium, Entity } from "resium";
+import {
+  getSatelliteByID,
+  getSatellites,
+  launchPropagation,
+  propagateSatellites,
+} from "../../services";
 import { geodeticToCesiumPosition } from "../../util/geodeticToCesiumPosition";
 import type { Satellite } from "../../types/satellite/satellite";
 import { SatelliteLayer } from "./SatelliteLayer";
+import SatelliteSidebar from "./SatelliteSidebar";
 
 function IonTileset() {
   const { viewer } = useCesium();
@@ -23,7 +29,7 @@ function IonTileset() {
     async function loadTileset() {
       if (!viewer) return;
       try {
-        const loaded = await CesiumTileset.fromIonAssetId(2275207);
+        const loaded = await CesiumTileset.fromIonAssetId(3830182);
 
         if (cancelled) {
           loaded.destroy();
@@ -54,24 +60,41 @@ function IonTileset() {
 function Globe() {
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
 
-  const [satellites, setSatellites] = useState<Satellite[]>([]);
+  const selectedSatelliteIDRef = useRef<
+    string | undefined
+  >(undefined);
 
-  useEffect(()=>{
-    launchPropagation(()=>{
-      // console.log("Setting");
-      // const temp = getSatellites();
-      const sats = getSatellites();
-      setSatellites(sats);
-      // console.log(temp[0].latestGeodeticPositions[temp[0].latestGeodeticPositions.length-1].epoch)
+  const [selectedSatellite, setSelectedSatellite] = useState<
+    Satellite | undefined
+  >(undefined);
+
+  // const [satellites, setSatellites] = useState<Satellite[]>([]);
+
+  useEffect(() => {
+    launchPropagation(() => {
+      if (selectedSatelliteIDRef.current)
+        setSelectedSatellite(getSatelliteByID(selectedSatelliteIDRef.current));
     });
   }, []);
 
   return (
     <div style={styles.mapWrapper}>
-      <Viewer full timeline={false} ref={ref}>
+      <Viewer full timeline={false} ref={ref}
+        resolutionScale={0.75}
+        msaaSamples={1}
+        >
         <IonTileset />
-        <SatelliteLayer/>
+        <SatelliteLayer
+          onSelect={(id: string) => {
+            selectedSatelliteIDRef.current = id;
+            setSelectedSatellite(getSatelliteByID(id));
+          }}
+          selectedSatelliteID={selectedSatelliteIDRef.current}
+        />
       </Viewer>
+      {selectedSatellite && (
+        <SatelliteSidebar satellite={selectedSatellite}/>
+      )}
     </div>
   );
 }
@@ -80,6 +103,14 @@ const styles: Record<string, React.CSSProperties> = {
   mapWrapper: {
     width: "100vw",
     height: "100vh",
+  },
+  sidebar: {
+    position: "fixed",
+    right: "10px",
+    top: "10px",
+    width: "300px",
+    height: "400px",
+    backgroundColor: "white",
   },
 };
 

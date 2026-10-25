@@ -3,11 +3,11 @@ import type { GeodeticState } from "../types/coordinates/geodetic";
 export function interpolateGeodetic(
   a: GeodeticState,
   b: GeodeticState,
-  time: Date,
+  t: number,
 ): GeodeticState | undefined {
-  if (time < a.epoch || time > b.epoch) return undefined;
+  if (t < a.epoch || t > b.epoch) return undefined;
 
-  let t: number = (time.getTime() - a.epoch.getTime()) / (b.epoch.getTime() - a.epoch.getTime());
+  t = (t - a.epoch) / (b.epoch - a.epoch);
 
   if (b.pos.longitude - a.pos.longitude > 180) b.pos.longitude -= 360; 
   if (b.pos.longitude - a.pos.longitude < -180) b.pos.longitude += 360; 
@@ -23,6 +23,6 @@ export function interpolateGeodetic(
       longitude: a.vel.longitude * (1 - t) + b.vel.longitude * t,
       latitude: a.vel.latitude * (1 - t) + b.vel.latitude * t,
     },
-    epoch: time,
+    epoch: t,
   };
 }
