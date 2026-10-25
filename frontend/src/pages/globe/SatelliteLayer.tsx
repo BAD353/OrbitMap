@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CallbackPositionProperty, Cartesian2, Cartesian3, Color, JulianDate, NearFarScalar, PointPrimitive, PointPrimitiveCollection, ScreenSpaceEventHandler, ScreenSpaceEventType } from "cesium";
 import {
   useCesium,
 } from "resium";
 import { getSatellitePosition, getSatellites } from "../../services";
-import { geodeticToCesiumPosition } from "../../util/geodeticToCesiumPosition";
-import { interpolateGeodetic } from "../../util/interpolateGeodetic";
 
 
 export function SatelliteLayer(

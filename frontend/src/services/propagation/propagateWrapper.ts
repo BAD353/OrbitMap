@@ -1,4 +1,3 @@
-import type { Satellite } from "../../types/satellite/satellite";
 import type { PropagateWorkerRequest } from "../../types/worker/propagateWorkerRequest";
 import type { PropagateWorkerReturn } from "../../types/worker/propagateWorkerReturn";
 

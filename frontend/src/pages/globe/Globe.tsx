@@ -1,19 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Cartesian3,
   Viewer as CesiumViewer,
-  Color,
-  NearFarScalar,
 } from "cesium";
 import { Cesium3DTileset as CesiumTileset } from "cesium";
-import { Viewer, type CesiumComponentRef, useCesium, Entity } from "resium";
+import { Viewer, type CesiumComponentRef, useCesium } from "resium";
 import {
   getSatelliteByID,
-  getSatellites,
   launchPropagation,
-  propagateSatellites,
 } from "../../services";
-import { geodeticToCesiumPosition } from "../../util/geodeticToCesiumPosition";
 import type { Satellite } from "../../types/satellite/satellite";
 import { SatelliteLayer } from "./SatelliteLayer";
 import SatelliteSidebar from "./SatelliteSidebar";

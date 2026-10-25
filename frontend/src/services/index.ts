@@ -1,8 +1,6 @@
-import { Cartesian3, JulianDate } from "cesium";
+import { Cartesian3 } from "cesium";
 import type { Satellite } from "../types/satellite/satellite";
 import type { PropagateWorkerRequest } from "../types/worker/propagateWorkerRequest";
-import { geodeticToCesiumPosition } from "../util/geodeticToCesiumPosition";
-import { interpolateGeodetic } from "../util/interpolateGeodetic";
 import { createPropagateWrapper } from "./propagation/propagateWrapper";
 import { loadElsetData } from "./storage/loadElsetData";
 import { loadSatelliteData } from "./storage/loadSatelliteData";

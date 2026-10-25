@@ -1,10 +1,8 @@
 import {
   eciToEcf,
-  eciToGeodetic,
   gstime,
   json2satrec,
   propagate,
-  radiansToDegrees,
   type OMMJsonObject,
 } from "satellite.js";
 import type { Satellite } from "../../types/satellite/satellite";

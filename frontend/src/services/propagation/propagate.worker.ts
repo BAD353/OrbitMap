@@ -1,5 +1,4 @@
-import {  eciToEcf, gstime, json2satrec, propagate, radiansToDegrees, type OMMJsonObject, type SatRec } from "satellite.js";
-import type { Satellite } from "../../types/satellite/satellite";
+import {  eciToEcf, gstime, json2satrec, propagate, type OMMJsonObject, type SatRec } from "satellite.js";
 import type { PropagateWorkerReturn } from "../../types/worker/propagateWorkerReturn";
 import type { PropagateWorkerRequest } from "../../types/worker/propagateWorkerRequest";
 import type { ECEFState } from "../../types/coordinates/ecef";

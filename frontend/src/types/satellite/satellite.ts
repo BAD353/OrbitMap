@@ -1,6 +1,5 @@
 import type { Elset } from "../elset/elset";
 import type { SatelliteInfo } from "./satelliteInfo";
-import type { GeodeticState } from "../coordinates/geodetic";
 import type { ECEFState } from "../coordinates/ecef";
 
 export interface Satellite {
