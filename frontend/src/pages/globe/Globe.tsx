@@ -87,7 +87,10 @@ function Globe() {
         />
       </Viewer>
       {selectedSatellite && (
-        <SatelliteSidebar satellite={selectedSatellite}/>
+        <SatelliteSidebar satellite={selectedSatellite} onClose={()=>{
+          selectedSatelliteIDRef.current = undefined;
+          setSelectedSatellite(undefined);
+        }}/>
       )}
     </div>
   );

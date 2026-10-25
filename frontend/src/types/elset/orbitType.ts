@@ -1,0 +1,1 @@
+export type OrbitType = "LEO" | "MEO" | "GEO" | "HEO" | "NEO"; 

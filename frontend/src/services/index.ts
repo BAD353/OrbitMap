@@ -60,7 +60,7 @@ export function propagateSatellites() {
   for (let i = 0; i < satelliteList.length; i++) {
     while (
       satelliteList[i].latestECEFPositions.length > 2 &&
-      satelliteList[i].latestECEFPositions[3].epoch < now
+      satelliteList[i].latestECEFPositions[2].epoch < now
     ) {
       satelliteList[i].latestECEFPositions.shift();
     }
