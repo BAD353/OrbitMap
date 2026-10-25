@@ -16,6 +16,7 @@ export default function SatelliteSidebar({satellite, onClose}: {satellite: Satel
       <p className="text subheading">Perigee · {satellite.latestElset?.periapsis}km</p>
       <p className="text subheading">Apogee · {satellite.latestElset?.apoapsis}km</p>
       <p className="text subheading">Semimajor · {satellite.latestElset?.semimajor_axis}km</p>
+      <p className="text subheading">Eccentricity · {satellite.latestElset?.eccentricity}</p>
 
     </div>
   );

@@ -4,6 +4,7 @@ import {
   Cartesian2,
   Cartesian3,
   Color,
+  HeadingPitchRoll,
   JulianDate,
   NearFarScalar,
   PointPrimitive,
@@ -28,9 +29,10 @@ export function SatelliteLayer({
 
   useEffect(() => {
     if (!viewer) return;
-    viewer.scene.debugShowFramesPerSecond = true;
+
     const collection = new PointPrimitiveCollection();
     viewer.scene.primitives.add(collection);
+    
     viewer.clock.shouldAnimate = true;
 
     const points: PointPrimitive[] = satellites.map((satellite) =>
@@ -112,7 +114,17 @@ export function SatelliteLayer({
 
     return () => {
       if (viewer.isDestroyed()) return;
-      if (viewer.trackedEntity == entity) viewer.trackedEntity = undefined;
+      if (viewer.trackedEntity == entity) {
+        viewer.trackedEntity = undefined;
+        viewer.camera.flyTo({
+          destination: viewer.camera.position, 
+          orientation:viewer.camera.position,
+          duration:0.5, 
+          complete:()=>{
+            // viewer.camera.setView({destination:new Cartesian3(0,0,0),})
+          }
+        });
+      }
       viewer.entities.remove(entity);
     };
   }, [viewer, selectedSatelliteID]);

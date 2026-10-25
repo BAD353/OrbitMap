@@ -10,10 +10,11 @@ export const orbitColors: Record<OrbitType, string> = {
 };
 
 export function getOrbitType(elset: Elset): OrbitType {
+  if (elset.apoapsis > 38000) return "NEO"; //to avoid classifying too many objects as HEO
   if (elset.eccentricity > 0.25) return "HEO";
   
   if (elset.apoapsis < 2000) return "LEO";
   if (elset.apoapsis < 34000) return "MEO";
-  if (elset.apoapsis < 38000) return "GEO";
+  if (elset.periapsis > 34000 && elset.apoapsis < 38000) return "GEO";
   return "NEO";
 }

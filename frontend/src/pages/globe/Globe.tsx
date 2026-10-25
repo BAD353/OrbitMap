@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Viewer as CesiumViewer,
+  ImageryLayer,
+  IonImageryProvider,
 } from "cesium";
 import { Cesium3DTileset as CesiumTileset } from "cesium";
 import { Viewer, type CesiumComponentRef, useCesium } from "resium";
@@ -12,27 +14,71 @@ import type { Satellite } from "../../types/satellite/satellite";
 import { SatelliteLayer } from "./SatelliteLayer";
 import SatelliteSidebar from "./SatelliteSidebar";
 
-function IonTileset() {
+const MAX_ZOOM_DISTANCE: number = 1000_000_000;
+const MIN_ZOOM_DISTANCE: number = 100_000;
+
+const MIN_TRACKING_ZOOM_DISTANCE: number = 70_000;
+
+function IonTileset({isSatelliteTracked}:{isSatelliteTracked: boolean}) {
   const { viewer } = useCesium();
+
+  useEffect(()=>{
+    if (!viewer) return;
+    if (isSatelliteTracked) {
+      // viewer.scene.screenSpaceCameraController.minimumZoomDistance = MIN_TRACKING_ZOOM_DISTANCE;
+    } else { 
+      // viewer.scene.screenSpaceCameraController.minimumZoomDistance = MIN_ZOOM_DISTANCE;
+    }
+  },[isSatelliteTracked]);
 
   useEffect(() => {
     if (!viewer) return;
-    let tileset: CesiumTileset | undefined;
+    let dayLayer: ImageryLayer;
+    let nightLayer: ImageryLayer;
     let cancelled = false;
+
+    viewer.scene.debugShowFramesPerSecond = true;
+
+    viewer.scene.globe.enableLighting = true;
+    
+    viewer.scene.screenSpaceCameraController.enableTranslate = false;
+    viewer.scene.screenSpaceCameraController.enableTilt = false;
+    viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAX_ZOOM_DISTANCE;
+    viewer.scene.screenSpaceCameraController.minimumZoomDistance = MIN_ZOOM_DISTANCE;
 
     async function loadTileset() {
       if (!viewer) return;
       try {
-        const loaded = await CesiumTileset.fromIonAssetId(3830182);
-
         if (cancelled) {
-          loaded.destroy();
+          dayLayer.destroy();
+          nightLayer.destroy();
           return;
         }
 
-        tileset = loaded;
-        viewer.scene.primitives.add(loaded);
-        await viewer.zoomTo(loaded);
+        const layers = viewer.imageryLayers;
+        layers.removeAll(); //base layer
+
+        dayLayer = ImageryLayer.fromProviderAsync(
+          IonImageryProvider.fromAssetId(
+            3830182
+          )
+        );
+        dayLayer.dayAlpha = 1.0;
+        dayLayer.nightAlpha = 0.0;
+
+        nightLayer = ImageryLayer.fromProviderAsync(
+          IonImageryProvider.fromAssetId(
+            3812
+          )
+        );
+        nightLayer.dayAlpha = 0.0;
+        nightLayer.nightAlpha = 1.0;
+        nightLayer.brightness = 2.0;
+
+        layers.add(dayLayer);
+        layers.add(nightLayer);
+
+        await viewer.zoomTo(dayLayer);
       } catch (error) {
         console.error("Failed to load ion tileset:", error);
       }
@@ -42,9 +88,6 @@ function IonTileset() {
 
     return () => {
       cancelled = true;
-      if (tileset && !tileset.isDestroyed()) {
-        viewer.scene.primitives.remove(tileset);
-      }
     };
   }, [viewer]);
 
@@ -77,7 +120,7 @@ function Globe() {
         resolutionScale={0.75}
         msaaSamples={1}
         >
-        <IonTileset />
+        <IonTileset isSatelliteTracked={selectedSatellite !== undefined} />
         <SatelliteLayer
           onSelect={(id: string) => {
             selectedSatelliteIDRef.current = id;
