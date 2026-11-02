@@ -16,7 +16,7 @@ A free, open-source orbit map tool showing 30k-ish satellites moving in real tim
 | MEO (medium Earth orbit) | Green | `#22C55E` | ~2,000 km up to just below geostationary | |
 | HEO (highly elliptical orbit) | Yellow | `#ffe600` | low perigee, very high apogee  |
 | GEO (geostationary / geosynchronous) | Purple | `#A855F7` | ~35,786 km  |
-| NEO | Pink | `#FF2D78` | beyond the classes above | |
+| NEO (near-Earth object) | Pink | `#FF2D78` | beyond the classes above | |
 
 
 ## How it works
@@ -42,7 +42,7 @@ Python, Node.js, PostgreSQL, a [Space-Track](https://www.space-track.org) accoun
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn <your_module>:app --reload
+uvicorn main:app --reload
 ```
 
 **Frontend**
@@ -54,8 +54,6 @@ npm run dev
 ```
 
 ## Configuration
-
-Names are placeholders. Use whatever the code reads, and never commit credentials.
 
 | Variable | Used by | Description |
 |---|---|---|
